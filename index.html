@@ -1,33 +1,192 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Festival Landing</title>
-    <meta name="description" content="지자체 축제 랜딩 페이지 · 픽셀형 프로그램 안내 · 카운트다운 · 예매/오시는길 CTA" />
-    <link rel="icon" href="/favicon.ico" />
-    <!-- GA4 (선택): 배포 후 ID 넣고 주석 해제하세요
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXX');
-    </script>
-    -->
-    <!-- Meta Pixel (선택): 배포 후 ID 넣고 주석 해제하세요
-    <script>
-      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', 'YOUR_PIXEL_ID'); fbq('track', 'PageView');
-    </script>
-    -->
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>지자체 축제 랜딩 – 픽셀형 프로그램</title>
+  <style>
+    :root { --emerald:#059669; --ink:#0f172a; --muted:#64748b; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Arial, sans-serif; color: var(--ink); background: #fff; }
+    .hero { position:relative; height: 42vh; min-height:320px; overflow:hidden; }
+    .hero img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+    .hero::after { content:''; position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0)); }
+    .hero__content { position:absolute; inset-inline:0; bottom:0; padding: 0 20px 20px; }
+    .container { max-width: 1120px; margin:0 auto; }
+    .headline { color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6); font-weight:800; font-size: clamp(28px, 4vw, 44px); }
+    .sub { color:rgba(255,255,255,.9); margin-top:6px; font-size: clamp(14px, 2.4vw, 18px); }
+    .meta { color:rgba(255,255,255,.8); margin-top:4px; font-size: clamp(12px, 2vw, 16px); }
+    .card { background: rgba(255,255,255,.92); backdrop-filter: blur(6px); border-radius: 16px; padding:16px; display:inline-block; }
+    .count { font-weight:800; font-size: clamp(20px, 4vw, 32px); letter-spacing:.02em; }
+    .btns { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border-radius:12px; border:1px solid #e2e8f0; background:#fff; font-weight:600; cursor:pointer; }
+    .btn--pri { background: var(--emerald); color:#fff; border-color: transparent; }
+    main { padding: 28px 20px 40px; }
+    h2 { font-size: 22px; font-weight:800; margin: 0 0 16px; }
+    .grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; }
+    @media (min-width: 700px) { .grid { grid-template-columns: repeat(6, minmax(0,1fr)); } }
+    .tile { border-radius:16px; padding:14px; box-shadow: 0 1px 3px rgba(2,6,23,.08); border:1px solid rgba(226,232,240,.8); cursor:pointer; }
+    .tile:hover { box-shadow: 0 4px 16px rgba(2,6,23,.12); transform: translateY(-1px); transition: all .15s; }
+    .tile__title { font-weight:700; font-size:14px; line-height:1.2; }
+    .tile__time { font-size:12px; opacity:.8; margin-top:4px; }
+    .detail { margin-top:18px; border:1px solid #e2e8f0; border-radius:16px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(2,6,23,.06); }
+    .badge { display:inline-flex; align-items:center; border-radius:999px; border:1px solid #bbf7d0; background:#f0fdf4; color:#166534; padding:4px 10px; font-size:12px; font-weight:700; }
+    .info { display:grid; gap:12px; margin-top:16px; }
+    @media (min-width: 700px){ .info { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+    .info > div { border:1px solid #e2e8f0; border-radius:16px; padding:16px; background:#fff; }
+    footer { padding: 0 20px 36px; color:#475569; }
+    footer .row { max-width:1120px; margin:0 auto; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    a.text { color:#0ea5e9; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <img id="hero" alt="hero" />
+    <div class="hero__content">
+      <div class="container" style="display:flex; gap:16px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap;">
+        <div>
+          <div class="headline" id="title"></div>
+          <div class="sub" id="slogan"></div>
+          <div class="meta" id="meta"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px; color:#64748b">오픈까지</div>
+          <div class="count" id="count"></div>
+          <div class="btns">
+            <button class="btn btn--pri" id="btn-ticket">예매하기</button>
+            <button class="btn" id="btn-map">오시는 길</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>프로그램 한눈에 보기</h2>
+    <div class="grid" id="grid"></div>
+
+    <section class="detail" id="detail" hidden>
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+        <div>
+          <div id="d-title" style="font-weight:800; font-size:18px;"></div>
+          <div id="d-time" style="color:#475569; font-size:14px; margin-top:4px;"></div>
+        </div>
+        <span class="badge" id="d-badge"></span>
+      </div>
+      <p id="d-desc" style="margin-top:10px; font-size:14px; color:#334155;"></p>
+      <div class="btns">
+        <button class="btn btn--pri" id="btn-ticket-2">이 프로그램 예매</button>
+        <button class="btn" id="btn-map-2">전체 일정 보기</button>
+      </div>
+    </section>
+
+    <section class="info">
+      <div>
+        <div style="font-weight:700">운영시간</div>
+        <div style="font-size:14px; color:#334155; margin-top:6px">10:00 ~ 21:30 (프로그램별 상이)</div>
+      </div>
+      <div>
+        <div style="font-weight:700">교통/주차</div>
+        <div style="font-size:14px; color:#334155; margin-top:6px">지하철 2호선 ○○역 도보 7분, 임시주차장 운영</div>
+      </div>
+      <div>
+        <div style="font-weight:700">유의사항</div>
+        <div style="font-size:14px; color:#334155; margin-top:6px">반려동물 동반 가능(리드필수), 외부 취식 가능</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="row">
+      <div>© 2025 봄꽃축제 · 한강시 시민공원 일대</div>
+      <div style="display:flex; gap:12px;">
+        <a class="text" href="#">개인정보처리방침</a>
+        <a class="text" href="#">공지사항</a>
+        <a class="text" href="#">고객센터</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const FESTIVAL = {
+      name: "🌸 2025 봄꽃축제",
+      start: "2025-04-12T10:00:00+09:00",
+      end:   "2025-04-14T21:00:00+09:00",
+      location: "한강시 시민공원 일대",
+      slogan: "봄바람 타고, 도시 한가운데서!",
+      heroImage: "https://images.unsplash.com/photo-1520975922284-4f56f3d5ebf6?q=80&w=1600&auto=format&fit=crop",
+      ticketUrl: "https://example.com/tickets",
+      mapUrl: "https://map.naver.com/",
+    };
+
+    const PROGRAMS = [
+      { id: "stage", title: "메인 공연", time: "토·일 18:00", weight: 3, value: 0.9, desc: "아이돌·밴드 라이브" },
+      { id: "parade", title: "플라워 퍼레이드", time: "매일 14:00", weight: 2, value: 0.7, desc: "지역 단체 참여" },
+      { id: "market", title: "지역 마켓", time: "상시", weight: 2, value: 0.6, desc: "푸드/핸드메이드" },
+      { id: "kids", title: "키즈존", time: "상시", weight: 1, value: 0.5, desc: "놀이터·체험" },
+      { id: "fireworks", title: "불꽃쇼", time: "토 20:30", weight: 2, value: 1.0, desc: "강변 불꽃" },
+      { id: "workshop", title: "꽃다발 클래스", time: "1일 4회", weight: 1, value: 0.4, desc: "사전 예약" },
+      { id: "photo", title: "포토스팟", time: "상시", weight: 1, value: 0.3, desc: "랜드마크 배경" },
+      { id: "local", title: "전통공연", time: "일 16:00", weight: 1, value: 0.55, desc: "풍물/민요" },
+    ];
+
+    const valueToBg = (v) => {
+      const light = 85 - Math.round(v * 35);
+      const sat = 45 + Math.round(v * 35);
+      return `hsl(152 ${sat}% ${light}%)`;
+    };
+    const valueToColor = (v) => (v > 0.75 ? "#fff" : "#0f172a");
+
+    document.getElementById("title").textContent = FESTIVAL.name;
+    document.getElementById("slogan").textContent = FESTIVAL.slogan;
+    document.getElementById("meta").textContent =
+      new Date(FESTIVAL.start).toLocaleDateString() + " – " +
+      new Date(FESTIVAL.end).toLocaleDateString() + " · " +
+      FESTIVAL.location;
+    document.getElementById("hero").src = FESTIVAL.heroImage;
+
+    const openUrl = (url) => window.open(url, "_blank", "noopener,noreferrer");
+    document.getElementById("btn-ticket").onclick = () => openUrl(FESTIVAL.ticketUrl);
+    document.getElementById("btn-map").onclick = () => openUrl(FESTIVAL.mapUrl);
+    document.getElementById("btn-ticket-2").onclick = () => openUrl(FESTIVAL.ticketUrl);
+    document.getElementById("btn-map-2").onclick = () => openUrl(FESTIVAL.mapUrl);
+
+    const target = new Date(FESTIVAL.start).getTime();
+    const countEl = document.getElementById("count");
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      const d = Math.floor(diff / (1000*60*60*24));
+      const h = Math.floor((diff / (1000*60*60)) % 24);
+      const m = Math.floor((diff / (1000*60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      countEl.textContent = `${d}일 ${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    };
+    tick(); setInterval(tick, 1000);
+
+    const grid = document.getElementById("grid");
+    PROGRAMS.forEach(p => {
+      const btn = document.createElement("button");
+      btn.className = "tile";
+      btn.style.background = valueToBg(p.value);
+      btn.style.color = valueToColor(p.value);
+      btn.style.gridColumn = `span ${Math.min(3, p.weight)}`;
+      btn.style.gridRow = p.weight === 3 ? "span 2" : "span 1";
+      btn.innerHTML = `<div class="tile__title">${p.title}</div><div class="tile__time">${p.time}</div>`;
+      btn.onclick = () => showDetail(p);
+      btn.onfocus = () => showDetail(p);
+      grid.appendChild(btn);
+    });
+
+    const detail = document.getElementById("detail");
+    function showDetail(p) {
+      document.getElementById("d-title").textContent = p.title;
+      document.getElementById("d-time").textContent = p.time;
+      document.getElementById("d-desc").textContent = p.desc;
+      document.getElementById("d-badge").textContent = `추천도 ${Math.round(p.value*100)}%`;
+      detail.hidden = false;
+      detail.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    showDetail(PROGRAMS[0]);
+  </script>
+</body>
 </html>
